@@ -17,6 +17,8 @@
 
 set -euo pipefail
 
+trap 'rc=$?; echo "ERROR: build.sh failed at line $LINENO (exit $rc)" >&2' ERR
+
 WORK="${WORK:-$HOME/xiaomi17-kbuild}"
 TC="${TC:-$HOME/toolchains}"
 JOBS="${JOBS:-$(nproc)}"
@@ -52,6 +54,11 @@ for c in git curl unzip make python3 patch zip; do need "$c"; done
 
 mkdir -p "$WORK" "$TC" "$WORK/tools"
 cd "$WORK"
+
+log "WORK=$WORK"
+log "TC=$TC"
+log "JOBS=$JOBS"
+df -h "$WORK" || true
 
 # ---------------------------------------------------------------------------
 # 1. 工具链
