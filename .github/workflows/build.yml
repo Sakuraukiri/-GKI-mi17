@@ -21,7 +21,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            zip unzip curl git build-essential bc bison flex \
+             zip unzip curl git build-essential bc bison flex \
             libssl-dev libelf-dev python3 rsync
 
       - name: Build
@@ -30,6 +30,25 @@ jobs:
           TC: ${{ github.workspace }}/tc
           JOBS: 4
         run: bash build.sh
+          set -e
+          echo "pwd=$(pwd)"
+          ls -la
+          echo "--- locate build.sh ---"
+          find . -maxdepth 3 -name build.sh -print
+          echo "--- build.sh first line (check CRLF) ---"
+          sed -n '1p' build.sh | cat -A
+          sed -i 's/\r$//' build.sh
+          bash -x build.sh
+
+      - name: Upload failure logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-failure-logs
+          path: |
+            work/src/build.log
+            work/src/**/*.rej
+          if-no-files-found: ignore
 
       - name: Upload AnyKernel3
         uses: actions/upload-artifact@v4
