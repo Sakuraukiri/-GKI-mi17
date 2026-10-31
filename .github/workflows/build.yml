@@ -21,7 +21,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-             zip unzip curl git build-essential bc bison flex \
+             zip unzip curl git patch build-essential bc bison flex \
             libssl-dev libelf-dev python3 rsync
 
       - name: Build
@@ -29,7 +29,7 @@ jobs:
           WORK: ${{ github.workspace }}/work
           TC: ${{ github.workspace }}/tc
           JOBS: 4
-        run: bash build.sh
+        run: |
           set -e
           echo "pwd=$(pwd)"
           ls -la
