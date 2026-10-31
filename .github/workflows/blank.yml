@@ -1,0 +1,39 @@
+name: build-xiaomi17-sukisu
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout builder
+        uses: actions/checkout@v4
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL || true
+          df -h
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            zip unzip curl git build-essential bc bison flex \
+            libssl-dev libelf-dev python3 rsync
+
+      - name: Build
+        env:
+          WORK: ${{ github.workspace }}/work
+          TC: ${{ github.workspace }}/tc
+          JOBS: 4
+        run: bash build.sh
+
+      - name: Upload AnyKernel3
+        uses: actions/upload-artifact@v4
+        with:
+          name: xiaomi17-sukisu-susfs-kpm
+          path: ${{ github.workspace }}/work/xiaomi17-sukisu-susfs-kpm.zip
+          if-no-files-found: error
